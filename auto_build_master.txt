@@ -1,5 +1,6 @@
 #!/bin/bash
 # Script to automate pc updates, setting up ssh and building master
+#VERSION 1.2
 
 #Colours
 GREEN='\033[1;32m'
@@ -46,6 +47,13 @@ fi
 
 #Setting up ssh
 echo -e "${GREEN}Setting up ssh...${NC}"
+is_ssh=$(rops setup_ssh)
+
+#Prompting user to setup ssh again due to error message (wrong password or missed 2fa notification)
+while read -r line
+do
+	echo -e "${RED}\nPlease enter your correct LDAP password${NC}"	
+done <<<$([[ "$is_ssh" == *"ERROR"* ]]) 
 rops setup_ssh
 
 #Checkout master, pulling and building
@@ -65,4 +73,3 @@ cat << "EOF"
 /_____/\____/___/_____/_____/  /_____/\____/_/ |_/_____/
 
 EOF
-
