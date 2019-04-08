@@ -1,0 +1,68 @@
+#!/bin/bash
+# Script to automate pc updates, setting up ssh and building master
+
+#Colours
+GREEN='\033[1;32m'
+RED='\033[1;31m'
+BLUE='\033[1;34m'
+NC='\033[0m'
+
+#Check directory for ~/source/av
+if [ "${PWD}" != "/home/$USER/av" ] && [ "${PWD}" != "/home/$USER/source/av" ]; then
+	echo -e "${RED}Please change directory to /source/av OR /av${NC}"
+	exit
+else
+	echo -e "${GREEN}Directory is good.${NC}"
+fi
+
+#Ask user if they want to update computer
+read -p 'Do you wish to update your machine? This is advised if you have not done so in a few days. y/n: ' answer
+
+#Update machine if user chooses to do so
+if [ $answer == "y" ] || [ $answer == "Y" ]; then
+	# Update machine
+	echo -e "${GREEN}\nUpdating machine...${NC}"
+	sudo apt-get update && apt-get install uberatc-dev && apt-get install uberatc-platform-workstation
+	echo -e "${GREEN}Machine successfully updated.${NC}\n"
+#Don't update machine if user does not want to, continue to setup ssh
+elif [ $answer == "n" ] || [ $answer == "N" ]; then
+	echo -e "${BLUE}OK. Machine will not be updated.${NC}\n"
+else
+	#Continue to prompt user to select y or n if input is undesired
+	while [ $answer != "y" ] || [ $answer != "Y" ]; do
+		read -p 'Please enter y or n: ' answer
+		if [ $answer == "y" ] || [ $answer == "Y" ]; then
+			echo -e "${GREEN}Updating machine...${NC}"
+			sudo apt-get update && apt-get install uberatc-dev && apt-get install uberatc-platform-workstation
+			echo -e "\n"
+			echo -e "${GREEN}Machine successfully updated.${NC}\n"
+			break
+		elif [ $answer == "n" ] || [ $answer == "N" ]; then
+			echo -e "${BLUE}OK. Machine will not be updated.${NC}\n"
+			break
+		fi
+	done
+fi
+
+#Setting up ssh
+echo -e "${GREEN}Setting up ssh...${NC}"
+rops setup_ssh
+
+#Checkout master, pulling and building
+echo -e "\n${GREEN}Checking out master branch...${NC}"
+git checkout master
+echo -e "\n${GREEN}Pulling...${NC}"
+git pull
+echo -e "\n${GREEN}Building all...${NC}"
+bops build all
+
+#ASCII art for "BUILD DONE" to let user know the build is complete
+cat << "EOF"
+    ____  __  ________    ____     ____  ____  _   ________
+   / __ )/ / / /  _/ /   / __ \   / __ \/ __ \/ | / / ____/
+  / __  / / / // // /   / / / /  / / / / / / /  |/ / __/   
+ / /_/ / /_/ // // /___/ /_/ /  / /_/ / /_/ / /|  / /___   
+/_____/\____/___/_____/_____/  /_____/\____/_/ |_/_____/
+
+EOF
+
