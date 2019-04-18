@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script to automate pc updates, setting up ssh and building master
-#VERSION 1.2.0
+#VERSION 1.2.1
 
 #Colours
 GREEN='\033[1;32m'
@@ -48,10 +48,10 @@ fi
 #Setting up ssh
 echo -e "${GREEN}Setting up ssh...${NC}"
 
-rops setup_ssh | grep 'ERROR';
+./rops setup_ssh | grep 'ERROR';
 if [ $? == 1 ]; then
 	echo -e "${RED}Incorrect password. Please try again..."
-	rops setup_ssh
+	./rops setup_ssh
 fi
 
 #Checkout master, pulling and building
@@ -60,7 +60,7 @@ git checkout master
 echo -e "\n${GREEN}Pulling...${NC}"
 git pull
 echo -e "\n${GREEN}Building all...${NC}"
-bops build all
+./bops build all
 
 #ASCII art for "BUILD DONE" to let user know the build is complete
 cat << "EOF"
